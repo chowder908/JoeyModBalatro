@@ -291,7 +291,7 @@ SMODS.Joker({
     calculate = function(self, card, from_debuff)
         if G.GAME.blind and ((not G.GAME.blind.disabled) and (G.GAME.blind:get_type() == 'Boss')) then 
             G.GAME.blind:disable()
-            return ({message = localize('jinzo_boss_disabled')})
+            return ({delay = 1.5, message = localize('jinzo_boss_disabled')})
         end
     end,
 })
