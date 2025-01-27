@@ -15,6 +15,7 @@ SMODS.ObjectType { key = 'varg_Thumb' }
 G.localization.misc.dictionary["YugiBoost"] = "Yu-gi-oh Booster"
 G.localization.misc.dictionary["vargThumb"] = "vargThumb"
 G.localization.misc.dictionary["JoelCards"] = "Joel Cards"
+G.localization.misc.dictionary["jinzo_boss_disabled"] = "Jinzo Has disbled the boss!"
 
 
 
@@ -75,12 +76,10 @@ SMODS.Booster({
     kind = { Tarot, Jokers },
     no_mod_badges = true,
     set_badges = function(self, card, badges)
-        badges[#badges+1] = create_badge(localize('k_JoelCards'), G.C.RED, G.C.BLACK, 1.2 )
+        badges[#badges+1] = create_badge(localize('JoelCards'), G.C.BLUE, G.C.YELLOW, 1.2 )
     end,
-end
     create_card = function(self)
         return { set = 'varg_Thumb', area = G.pack_cards }
-    end,
 end
 })
 

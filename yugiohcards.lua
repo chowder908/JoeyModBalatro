@@ -264,3 +264,35 @@ SMODS.Consumable({
         end
     end,
 })
+
+--function jinzo_removed(self, card, from_debuff)
+--    
+--end
+
+SMODS.Joker({
+    key = "Jinzo",
+    loc_txt = {
+    name = 'Jinzo',
+    text = {
+        'Binds, and their effects',
+        'during the round, cannot be activated.',
+        'Negate all binds on the board.'      
+        },
+    },
+        config = { xchips = 2.5 },
+    rarity = 1,
+    pos = { x = 6, y = 0 },
+    atlas = "TCGyugioh",
+    cost = 5,
+    unlocked = true,
+    discovered = true,
+    pools = { TCG_Yugioh = true },
+    blueprint_compat = true,
+    calculate = function(self, card, from_debuff)
+        if G.GAME.blind and ((not G.GAME.blind.disabled) and (G.GAME.blind:get_type() == 'Boss')) then 
+            G.GAME.blind:disable()
+            return ({message = localize('jinzo_boss_disabled')})
+        end
+    end,
+})
+
