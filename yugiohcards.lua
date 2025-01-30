@@ -265,10 +265,6 @@ SMODS.Consumable({
     end,
 })
 
---function jinzo_removed(self, card, from_debuff)
---    
---end
-
 SMODS.Joker({
     key = "Jinzo",
     loc_txt = {
@@ -291,8 +287,144 @@ SMODS.Joker({
     calculate = function(self, card, from_debuff)
         if G.GAME.blind and ((not G.GAME.blind.disabled) and (G.GAME.blind:get_type() == 'Boss')) then 
             G.GAME.blind:disable()
-            return ({delay = 1.5, message = localize('jinzo_boss_disabled')})
+            return ({delay = 3.5, message = localize('jinzo_boss_disabled')})
         end
     end,
 })
 
+SMODS.Consumable({
+    key = 'Copycat', --joker key
+    set = 'Tarot',
+    loc_txt = { -- local text
+        name = 'Copycat',
+        text = {
+            'Target 1 face-up Joker you control;',
+            'this card becomes a copy of',
+            'the selected Joker.'
+        },
+    },
+    atlas = 'TCGyugioh', --atlas' key
+    cost = 10, --cost
+    unlocked = true, --where it is unlocked or not: if true,
+    discovered = true, --whether or not it starts discovered
+    pools = { TCG_Yugioh = true },
+    pos = {x = 1, y = 1}, --position in atlas, starts at 0, scales by the atlas' card size (px and py): {x = 1, y = 0} would mean the sprite is 71 pixels to the right
+    loc_vars = function(self, info_queue, center)
+        return 
+    end,
+    config = {
+      extra = {
+        card_limit = 3 --configurable value
+      }
+    },
+    can_use = function(self, card)
+        if G.GAME.facing_blind then
+            return true
+          elseif G.STATE == G.STATES.SMODS_BOOSTER_OPENED then
+            return true
+          else
+            return false
+          end
+        end,
+          use = function(self, card, area, copier)
+              if G.STATE == G.STATES.SMODS_BOOSTER_OPENED then
+                local _card = copy_card(G.jokers.cards[1])
+                card:start_materialize()
+                card:add_to_deck()
+                G.jokers:emplace(_card)
+              elseif G.STATE == G.STATES.PLAY_TAROT then
+                local _card = copy_card(G.jokers.cards[1])
+                card:start_materialize()
+                card:add_to_deck()
+                G.jokers:emplace(_card)
+        end
+    end,
+})
+
+
+
+SMODS.Joker({
+    key = "Slifer",
+    loc_txt = { -- local text
+    name = 'Slifer the Sky Dragon',
+    text = {
+        'The heavens twist and thunder roars,',
+        'signaling the coming of this ancient',
+        ' creature, and the dawn of true power.'      
+        },
+    },
+    config = { xchips = 2.5 },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card and card.ability.xchips or self.config.xchips } }
+    end,
+    rarity = 1,
+    unlocked = true, 
+    discovered = true, 
+    pools = { TCG_Yugioh = true },
+    pos = { x = 7, y = 0 },
+    atlas = "TCGyugioh",
+    cost = 6,
+    blueprint_compat = true,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            return { xchips = card.ability.xchips }
+        end
+    end,
+})
+
+SMODS.Joker({
+    key = "Ra",
+    loc_txt = {
+    name = 'The Winged Dragon of Ra',
+    text = {
+        'Spirits sing of a powerful creature',
+        ' that rules over all that is mystic.'     
+        },
+    },
+    config = { chips = 50 },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card and card.ability.chips or self.config.chips } }
+    end,
+    rarity = 1,
+    pos = { x = 8, y = 0 },
+    atlas = "TCGyugioh",
+    cost = 5,
+    unlocked = true, --where it is unlocked or not: if true, 
+    discovered = true, --whether or not it starts discovered
+    pools = { TCG_Yugioh = true },
+    blueprint_compat = true,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            return { chips = card.ability.chips }
+        end
+    end,
+})
+SMODS.Joker({
+    key = "Obelisk",
+    loc_txt = {
+    name = 'Obelisk the Tormentor',
+    text = {
+        'The descent of this mighty creature shall',
+        'be heralded by burning winds and twisted land.',
+        'And with the coming of this horror, those who',
+        'draw breath shall know the true meaning of eternal slumber.'      
+    },
+    },
+    config = { xmult = 1.5 },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card and card.ability.xmult or self.config.xmult } }
+    end,
+    rarity = 1,
+    pos = { x = 9, y = 0 },
+    atlas = "TCGyugioh",
+    unlocked = true, 
+    discovered = true, 
+    pools = { TCG_Yugioh = true },
+    cost = 6,
+    blueprint_compat = true,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            return { xmult = card.ability.xmult }
+        end
+    end,
+})
