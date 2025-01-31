@@ -65,6 +65,28 @@ function forbidden_part_added(center, card, from_debuff)
     end
 end
 
+function destiny_board_win(center, card, from_debuff)
+    if not (G.GAME.won or G.GAME.win_notified)
+    then
+        for k, v in ipairs({ "j_tcgyugi_Destiny_Board", "j_tcgyugi_Spirit_E", "j_tcgyugi_Spirit_A", "j_tcgyugi_Spirit_T", "j_tcgyugi_Spirit_H" }) do
+            if center.key ~= v and #SMODS.find_card(v) == 0 then
+                return
+            end
+        end
+        G.GAME.win_notified = true
+        G.E_MANAGER:add_event(Event({
+            trigger = 'immediate',
+            blocking = false,
+            blockable = false,
+            func = (function()
+                win_game()
+                G.GAME.won = true
+                return true
+            end)
+        }))
+    end
+end
+
 SMODS.Joker({
     key = "forbidden_one",
     loc_txt = {
@@ -425,6 +447,168 @@ SMODS.Joker({
     calculate = function(self, card, context)
         if context.joker_main then
             return { xmult = card.ability.xmult }
+        end
+    end,
+})
+
+SMODS.Joker({
+    key = "Destiny_Board",
+    loc_txt = {
+    name = 'Destiny Board',
+    text = {
+        'When this card and all 4 "Spirit Message" cards with',
+        'different names are placed on your field, you win',
+        'the Duel. Once per turn, during end of each round',
+        'Place 1 "Spirit Message" card from into your joker slot',
+        'in the proper order of "E", "A", "T", and "H".',
+        'When any "Spirit Message" card or "Destiny Board" you control leaves the field,',
+        'send all "Spirit Message" cards and "Destiny Board" you control to the GY.'
+    },
+    },
+    config = { payout = 4 },
+    loc_vars = function(self, info_queue, card)
+        table.insert(info_queue, SMODS.Centers.j_tcgyugi_Spirit_E)
+        table.insert(info_queue, SMODS.Centers.j_tcgyugi_Spirit_A)
+        table.insert(info_queue, SMODS.Centers.j_tcgyugi_Spirit_T)
+        table.insert(info_queue, SMODS.Centers.j_tcgyugi_Spirit_H)
+        return { vars = { card and card.ability.payout or self.config.payout } }
+    end,
+    rarity = 1,
+    pos = { x = 2, y = 1 },
+    atlas = "TCGyugioh",
+    cost = 8,
+    pools = { TCG_Yugioh = true },
+    unlocked = true, --where it is unlocked or not: if true,
+    discovered = true, --whether or not it starts discovered
+    add_to_deck = destiny_board_win,
+    calculate = function(self, card, context)
+        if context.end_of_round and context.main_eval G.GAME.blind.boss and #G.jokers.cards + (G.GAME.joker_buffer or 0) < G.jokers.config.card_limit then
+            if #SMODS.find_card('j_tcgyugi_Spirit_E') == 0 then
+            SMODS.add_card { set = 'Joker', key = 'j_tcgyugi_Spirit_E' }
+        elseif
+            #SMODS.find_card('j_tcgyugi_Spirit_A') == 0 then
+            SMODS.add_card { set = 'Joker', key = 'j_tcgyugi_Spirit_A' }
+        elseif
+            #SMODS.find_card('j_tcgyugi_Spirit_T') == 0 then
+            SMODS.add_card { set = 'Joker', key = 'j_tcgyugi_Spirit_T' } 
+        elseif
+            #SMODS.find_card('j_tcgyugi_Spirit_H') == 0 then
+            SMODS.add_card { set = 'Joker', key = 'j_tcgyugi_Spirit_H' } 
+            end
+        end
+    end
+})
+
+SMODS.Joker({
+    key = "Spirit_E",
+    loc_txt = { -- local text
+    name = 'Spirit Message "I" ',
+    text = {
+        'Can only be placed on the field',
+        ' by the effect of "Destiny Board".'    
+        },
+    },
+    config = { xchips = 2.5 },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card and card.ability.xchips or self.config.xchips } }
+    end,
+    rarity = 4,
+    unlocked = true, 
+    discovered = true, 
+    pools = { TCG_Yugioh = false },
+    pos = { x = 3, y = 1 },
+    atlas = "TCGyugioh",
+    cost = 6,
+    blueprint_compat = true,
+    add_to_deck = destiny_board_win,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            return { chips = card.ability.chips }
+        end
+    end,
+})
+
+SMODS.Joker({
+    key = "Spirit_A",
+    loc_txt = {
+    name = 'Spirit Message "A" ',
+    text = {
+        'Can only be placed on the field',
+        'by the effect of "Destiny Board".'    
+        },
+    },
+    config = { chips = 50 },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card and card.ability.chips or self.config.chips } }
+    end,
+    rarity = 4,
+    pos = { x = 4, y = 1 },
+    atlas = "TCGyugioh",
+    cost = 5,
+    unlocked = true, --where it is unlocked or not: if true, 
+    discovered = true, --whether or not it starts discovered
+    pools = { TCG_Yugioh = false },
+    blueprint_compat = true,
+    add_to_deck = destiny_board_win,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            return { chips = card.ability.chips }
+        end
+    end,
+})
+SMODS.Joker({
+    key = "Spirit_T",
+    loc_txt = {
+    name = 'Spirit Message "T" ',
+    text = {
+        'Can only be placed on the field',
+        'by the effect of "Destiny Board".'    
+        },
+    },
+    config = { xmult = 1.5 },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card and card.ability.xmult or self.config.xmult } }
+    end,
+    rarity = 4,
+    pos = { x = 5, y = 1 },
+    atlas = "TCGyugioh",
+    unlocked = true, 
+    discovered = true, 
+    pools = { TCG_Yugioh = false },
+    cost = 6,
+    blueprint_compat = true,
+    add_to_deck = destiny_board_win,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            return { xmult = card.ability.xmult }
+        end
+    end,
+})
+SMODS.Joker({
+    key = "Spirit_H",
+    loc_txt = { -- local text
+    name = 'Spirit Message "H" ',
+    text = {
+        'Can only be placed on the field',
+        'by the effect of "Destiny Board".'    
+        },
+    },
+    config = { mult = 10 },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card and card.ability.mult or self.config.mult } }
+    end,
+    rarity = 4,
+    pos = { x = 6, y = 1 },
+    atlas = "TCGyugioh",
+    cost = 5,
+    unlocked = true, 
+    discovered = true,
+    pools = { TCG_Yugioh = false },
+    blueprint_compat = true,
+    add_to_deck = destiny_board_win,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            return { mult = card.ability.mult }
         end
     end,
 })
