@@ -482,7 +482,7 @@ SMODS.Joker({
     discovered = true, --whether or not it starts discovered
     add_to_deck = destiny_board_win,
     calculate = function(self, card, context)
-        if context.end_of_round and context.main_eval G.GAME.blind.boss and #G.jokers.cards + (G.GAME.joker_buffer or 0) < G.jokers.config.card_limit then
+        if context.end_of_round and context.main_eval and G.GAME.blind.boss and #G.jokers.cards + (G.GAME.joker_buffer or 0) >= G.jokers.config.card_limit then
             if #SMODS.find_card('j_tcgyugi_Spirit_E') == 0 then
             SMODS.add_card { set = 'Joker', key = 'j_tcgyugi_Spirit_E' }
         elseif
@@ -584,6 +584,7 @@ SMODS.Joker({
         end
     end,
 })
+
 SMODS.Joker({
     key = "Spirit_H",
     loc_txt = { -- local text
@@ -599,6 +600,84 @@ SMODS.Joker({
     end,
     rarity = 4,
     pos = { x = 6, y = 1 },
+    atlas = "TCGyugioh",
+    cost = 5,
+    unlocked = true, 
+    discovered = true,
+    pools = { TCG_Yugioh = false },
+    blueprint_compat = true,
+    add_to_deck = destiny_board_win,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            return { mult = card.ability.mult }
+        end
+    end,
+})
+
+SMODS.Consumable({
+    key = 'Black_Illusion_Ritual', --joker key
+    set = 'Tarot',
+    loc_txt = { -- local text
+        name = 'Black Illusion Ritual',
+        text = {
+            'This card is used to Ritual Summon',
+            '"Relinquished". You must also Discard',
+            'an ace card from your hand.'
+        },
+    },
+    atlas = 'TCGyugioh', --atlas' key
+    cost = 10, --cost
+    unlocked = true, --where it is unlocked or not: if true,
+    discovered = true, --whether or not it starts discovered
+    pools = { TCG_Yugioh = true },
+    pos = {x = 0, y = 2}, --position in atlas, starts at 0, scales by the atlas' card size (px and py): {x = 1, y = 0} would mean the sprite is 71 pixels to the right
+--    loc_vars = function(self, info_queue, card,)
+--        return { vars = { card and card.consumeable.ability or self.consumeable.ability } } 
+--   end,
+   config = {
+    ability = remove_card,
+      extra = {
+        card_limit = 3 --configurable value
+      }
+    },
+    can_use = function(self, card)
+        if G.GAME.facing_blind then
+            return true
+          elseif G.STATE == G.STATES.SMODS_BOOSTER_OPENED then
+            return true
+          else
+            return false
+          end
+        end,
+          use = function(self, card, area, copier)
+              if G.STATE == G.STATES.SMODS_BOOSTER_OPENED then
+                if #SMODS.find_card('A_D', 'A_H', 'A_S', 'A_C') == 1 then
+                    SMODS.add_card { set = 'Joker', key = 'j_tcgyugi_Relinquished' }
+              elseif G.STATE == G.STATES.PLAY_TAROT then
+                if #SMODS.find_card('A_D', 'A_H', 'A_S', 'A_C') == 1 then
+                    SMODS.add_card { set = 'Joker', key = 'j_tcgyugi_Relinquished' }
+                end
+            end
+        end
+    end,
+})
+
+
+SMODS.Joker({
+    key = "Relinquished",
+    loc_txt = { -- local text
+    name = 'Relinquished',
+    text = {
+        'Can only be placed on the field',
+        'by the effect of "Destiny Board".'    
+        },
+    },
+    config = { mult = 10 },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card and card.ability.mult or self.config.mult } }
+    end,
+    rarity = 4,
+    pos = { x = 1, y = 2 },
     atlas = "TCGyugioh",
     cost = 5,
     unlocked = true, 
