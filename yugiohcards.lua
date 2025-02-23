@@ -649,16 +649,13 @@ SMODS.Consumable({
             return false
           end
         end,
-          use = function(self, card, area, copier)
-              if G.STATE == G.STATES.SMODS_BOOSTER_OPENED then
-                if #SMODS.find_card('A_D', 'A_H', 'A_S', 'A_C') == 1 then
-                    SMODS.add_card { set = 'Joker', key = 'j_tcgyugi_Relinquished' }
-              elseif G.STATE == G.STATES.PLAY_TAROT then
-                if #SMODS.find_card('A_D', 'A_H', 'A_S', 'A_C') == 1 then
+          use = function(self, card, copier, context)
+            if context.individual and context.cardarea == G.hand and not context.end_of_round then
+                local cardInHand = context.other_card
+                if cardInhand:get_id() == 14 then -- The ID of Ace
                     SMODS.add_card { set = 'Joker', key = 'j_tcgyugi_Relinquished' }
                 end
             end
-        end
     end,
 })
 
